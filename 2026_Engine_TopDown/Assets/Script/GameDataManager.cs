@@ -25,7 +25,7 @@ public class GameDataManager : MonoBehaviour
             savePath = Application.persistentDataPath + "/saveData.json";
 
             LoadJsonData();
-            LoadLayerPrefs();
+            LoadPlayerPrefs();
         }
         else
         {
@@ -48,6 +48,11 @@ public class GameDataManager : MonoBehaviour
         return baseAttack + bonusAttack * saveData.deathCount;
     }
 
+    public float GetPlayerMoveSpeed()
+    {
+        return gameSettingData.playerMoveSpeed;
+    }
+
     public void SaveGameResult()
     {
         saveData.deathCount++;
@@ -64,12 +69,12 @@ public class GameDataManager : MonoBehaviour
         Debug.Log("JSON 저장 완료: " + savePath);
     }
 
-    public void LoadjsonData()
+    public void LoadJsonData()
     {
         if (File.Exists(savePath))
         {
             string json = File.ReadAllText(savePath);
-            saveData = JsonUtility.FromJson<SaveData>)json);
+            saveData = JsonUtility.FromJson<SaveData>(json);
         }
         else
         {
@@ -93,12 +98,19 @@ public class GameDataManager : MonoBehaviour
 
     public void LoadPlayerPrefs()
     {
-        PlayerPrefs.SetInt("TUTORIAL", inTutorialFinished);
+        PlayerPrefs.SetInt("TUTORIAL", isTutorialFinished);
         PlayerPrefs.Save();
 
         Debug.Log("PlayerPrefs 저장 완료");
     }
 
+    public void SavePlayerPrefs()
+    {
+        PlayerPrefs.SetInt("TUTORIAL", isTutorialFinished);
+        PlayerPrefs.Save();
+
+        Debug.Log("PlayerPrefs 저장 완료");
+    }
     public void DeletePlayerPrefs()
     {
         PlayerPrefs.DeleteKey("TUTORIAL");

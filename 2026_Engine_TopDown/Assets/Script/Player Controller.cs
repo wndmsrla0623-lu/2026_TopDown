@@ -30,7 +30,6 @@ public class PlayerController : MonoBehaviour
 
     private float timer = 0f;
 
-
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
@@ -63,7 +62,6 @@ public class PlayerController : MonoBehaviour
             }
         }
     }
-
     private void Update()
     {
         if (input.sqrMagnitude <= 0.01f)
