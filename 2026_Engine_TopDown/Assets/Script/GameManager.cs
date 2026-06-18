@@ -8,7 +8,7 @@ public class GameManager : MonoBehaviour
     public string gameSceneName = "GameScene";
 
 
-    private void Awake()
+    private void Awake() 
     {
         if (Instance == null)
         {
