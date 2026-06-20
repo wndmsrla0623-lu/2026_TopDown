@@ -1,5 +1,7 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
+using TMPro;
 
 public class GameManager : MonoBehaviour
 {
@@ -8,6 +10,20 @@ public class GameManager : MonoBehaviour
     public string gameSceneName = "GameScene";
 
 
+    public TextMeshProUGUI timerText;
+    public TextMeshProUGUI pebbleText;
+
+    private float survivalTime = 0f;
+    private int pebbleCount = 0;
+
+    void Update()
+    {
+        survivalTime = survivalTime + Time.deltaTime;
+
+        int seconds = (int)survivalTime;
+
+        timerText.text = "시간: " + seconds + "초";
+    }
     private void Awake() 
     {
         if (Instance == null)
@@ -35,5 +51,13 @@ public class GameManager : MonoBehaviour
     public void GoTitle()
     {
         SceneManager.LoadScene(titleSceneName);
+    }
+
+    public void AddPebble()
+    {
+        pebbleCount = pebbleCount + 1;
+        pebbleText.text = "조약돌: " + pebbleCount + "개";
+        Debug.Log("조약돌 획득! 현재 개수: " + pebbleCount);
+        ItemSpawner.Instance.SpawnOnePebble();
     }
 }
