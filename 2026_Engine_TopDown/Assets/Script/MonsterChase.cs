@@ -6,76 +6,73 @@ public class MonsterChase : MonoBehaviour
     private Transform playerTransform; // 플레이어 위치
 
     private SpriteRenderer spriteRenderer;
+    private Rigidbody2D rb;            // 물리를 제어할 리지드바디 변수 추가
 
-    [Header("방향별 스프라이트 배열 (플레이어와 동일 구조)")]
+    [Header("방향별 스프라이트 배열")]
     public Sprite[] spriteUp;
     public Sprite[] spriteDown;
     public Sprite[] spriteLeft;
     public Sprite[] spriteRight;
 
-    public int attackDamage = 10;
-    public float knockbackForce = 3f;
-
     [Header("애니메이션 속도 설정")]
-    public float frameTime = 0.15f;    // 프레임 전환 시간 (플레이어와 동일)
+    public float frameTime = 0.15f;
 
     private int currentFrame = 0;
     private float animationTimer = 0f;
-    private Sprite[] currentAnimationArray; // 현재 재생해야 할 방향의 배열
+    private Sprite[] currentAnimationArray;
+
+    [Header("몬스터 공격 및 넉백 설정")]
+    public int attackDamage = 10;
+    public float knockbackForce = 3f;
 
     void Start()
     {
         spriteRenderer = GetComponent<SpriteRenderer>();
+        rb = GetComponent<Rigidbody2D>(); // 리지드바디 컴포넌트 가져오기
 
-        // 플레이어 찾기
         GameObject player = GameObject.FindGameObjectWithTag("Player");
         if (player != null)
         {
             playerTransform = player.transform;
         }
 
-        // 기본 상태는 아래를 바라보는 애니메이션으로 시작
         currentAnimationArray = spriteDown;
+    }
+
+    void FixedUpdate() // 물리를 사용하는 이동은 FixedUpdate에서 처리하는 것이 안전합니다.
+    {
+        if (playerTransform == null || rb == null) return;
+
+        // 1. 플레이어 방향 벡터 계산 후 리지드바디의 속도(Velocity)로 이동 처리!
+        // 이 방식으로 이동해야 슬라임끼리 부딪혔을 때 물리 엔진이 서로를 밀어낼 수 있습니다.
+        Vector2 direction = (playerTransform.position - transform.position).normalized;
+        rb.linearVelocity = direction * speed;
+
+        // 2. 이동 방향 분석하여 애니메이션 선택
+        SetAnimationDirection(direction);
     }
 
     void Update()
     {
-        if (playerTransform == null) return;
-
-        // 1. 플레이어 방향 벡터 계산 및 이동
-        Vector3 direction = (playerTransform.position - transform.position).normalized;
-        transform.position += direction * speed * Time.deltaTime;
-
-        // 2. 이동 방향을 분석하여 적절한 애니메이션 배열 선택
-        SetAnimationDirection(direction);
-
-        // 3. 선택된 방향의 스프라이트를 시간에 맞춰 번갈아 재생
+        // 3. 선택된 방향의 스프라이트를 시간에 맞춰 재생
         PlayAnimation();
     }
 
-    // 몬스터가 움직이는 방향 벡터(x, y)를 분석해 상하좌우를 판단하는 함수
-    void SetAnimationDirection(Vector3 dir)
+    void SetAnimationDirection(Vector2 dir)
     {
         Sprite[] previousArray = currentAnimationArray;
 
-        // X축 이동량이 Y축 이동량보다 클 때 (좌우 이동 우세)
         if (Mathf.Abs(dir.x) > Mathf.Abs(dir.y))
         {
-            if (dir.x > 0f)
-                currentAnimationArray = spriteRight;
-            else
-                currentAnimationArray = spriteLeft;
+            if (dir.x > 0f) currentAnimationArray = spriteRight;
+            else currentAnimationArray = spriteLeft;
         }
-        // Y축 이동량이 X축 이동량보다 클 때 (상하 이동 우세)
         else
         {
-            if (dir.y > 0f)
-                currentAnimationArray = spriteUp;
-            else
-                currentAnimationArray = spriteDown;
+            if (dir.y > 0f) currentAnimationArray = spriteUp;
+            else currentAnimationArray = spriteDown;
         }
 
-        // 만약 몬스터의 방향이 바뀌었다면 애니메이션 프레임을 리셋하여 어색함을 방지
         if (previousArray != currentAnimationArray)
         {
             currentFrame = 0;
@@ -83,7 +80,6 @@ public class MonsterChase : MonoBehaviour
         }
     }
 
-    // 배열에 등록된 여러 장의 이미지를 순서대로 바꾸어주는 애니메이션 재생 함수
     void PlayAnimation()
     {
         if (currentAnimationArray == null || currentAnimationArray.Length == 0) return;
@@ -93,11 +89,9 @@ public class MonsterChase : MonoBehaviour
         if (animationTimer >= frameTime)
         {
             animationTimer = 0f;
-            // 다음 프레임으로 넘어가되, 배열의 끝에 도달하면 다시 0번으로 순환
             currentFrame = (currentFrame + 1) % currentAnimationArray.Length;
         }
 
-        // 최종적으로 선택된 프레임의 이미지를 스프라이트 렌더러에 뿌려줌
         spriteRenderer.sprite = currentAnimationArray[currentFrame];
     }
 
@@ -109,18 +103,12 @@ public class MonsterChase : MonoBehaviour
 
             if (playerHealth != null)
             {
-                // 1. 플레이어에게 데미지를 줍니다 (플레이어 무적 상태면 알아서 무시됨)
                 playerHealth.TakeDamage(attackDamage);
 
-                // 2. ★ 둘이 한 몸처럼 겹치지 않도록 밀어내는 넉백 처리!
-                // 플레이어로부터 내가 온 방향의 반대 벡터를 구합니다.
-                Vector3 knockbackDirection = (transform.position - other.transform.position).normalized;
-
-                // 슬라임의 위치를 순간적으로 플레이어 바깥쪽으로 확 밀어버립니다.
-                transform.position += knockbackDirection * knockbackForce;
+                // 플레이어와 부딪혔을 때 넉백 처리
+                Vector2 knockbackDirection = (transform.position - other.transform.position).normalized;
+                transform.position += (Vector3)knockbackDirection * knockbackForce;
             }
         }
     }
 }
-
-    

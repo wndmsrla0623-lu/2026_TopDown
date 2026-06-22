@@ -3,7 +3,7 @@ using UnityEngine;
 public class MonsterSpawner : MonoBehaviour
 {
     public GameObject slimePrefab;     // 소환할 슬라임 프리팹
-    public float spawnInterval = 3f;   // 몬스터가 소환되는 시간 간격 (3초에 한 마리씩)
+    public float spawnInterval = 10f;   // 몬스터가 소환되는 시간 간격 (10초에 한 마리씩)
 
     [Header("스폰할 사각형 영역 설정")]
     public float minX = -7.5f; // 우리가 맞춘 완벽한 잔디밭 사각형 좌표!
@@ -28,6 +28,7 @@ public class MonsterSpawner : MonoBehaviour
     {
         // 잔디밭 영역 안에서 무작위 좌표 생성
         float randomX = Random.Range(minX, maxX);
+
         float randomY = Random.Range(minY, maxY);
         Vector3 randomPosition = new Vector3(randomX, randomY, 0f);
 

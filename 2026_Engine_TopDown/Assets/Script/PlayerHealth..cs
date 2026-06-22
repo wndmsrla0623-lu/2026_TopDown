@@ -26,9 +26,26 @@ public class PlayerHealth : MonoBehaviour
 
         Debug.Log($"아야! 플레이어가 {damageAmount}의 데미지를 받았습니다. 남은 체력: {currentHealth}/{maxHealth}");
 
+        // HP가 0이 되었을 때 처리하는 조건문 내부
         if (currentHealth <= 0)
         {
-            Die();
+            Debug.Log("플레이어 사망!");
+
+            // 💡여기에 GameManager를 찾아서 GameOver() 함수를 실행하라는 명령을 내립니다!
+            GameManager gameManager = FindFirstObjectByType<GameManager>();
+            if (gameManager != null)
+            {
+                gameManager.GameOver(); // GameManager에 있는 게임오버 로직 가동!
+            }
+            else
+            {
+                Debug.LogError("씬에 GameManager 오브젝트를 찾을 수 없습니다!");
+            }
+
+            // ⚠️ 중요: Destroy(gameObject); 코드가 카메라를 물고 있다면 
+            // 카메라 에러가 나므로, 안전하게 플레이어의 이미지와 충돌체만 꺼줍니다.
+            GetComponent<SpriteRenderer>().enabled = false;
+            GetComponent<Collider2D>().enabled = false;
         }
     }
 

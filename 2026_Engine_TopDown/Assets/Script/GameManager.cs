@@ -7,7 +7,8 @@ public class GameManager : MonoBehaviour
 {
     public static GameManager Instance;
     public string titleSceneName = "TitleScene";
-    public string gameSceneName = "GameScene";
+    public string gameSceneName = "Stage_1";
+    public GameObject gameOverPanel;
 
 
     public TextMeshProUGUI timerText;
@@ -18,18 +19,23 @@ public class GameManager : MonoBehaviour
 
     void Update()
     {
-        survivalTime = survivalTime + Time.deltaTime;
-
+        // 1. 매 프레임마다 시간을 정상적으로 더해줍니다.
+        survivalTime += Time.deltaTime;
         int seconds = (int)survivalTime;
 
-        timerText.text = "시간: " + seconds + "초";
+        // 2. Start()에서 찾아온 timerText UI에 실시간으로 시간을 그려줍니다!
+        if (timerText != null)
+        {
+            timerText.text = "시간: " + seconds + "초";
+        }
     }
-    private void Awake() 
+
+    private void Awake()
     {
+        // 💡 씬이 바뀔 때 깨끗하게 초기화되도록 DontDestroyOnLoad를 완전히 제거한 깔끔한 싱글톤입니다.
         if (Instance == null)
         {
             Instance = this;
-            DontDestroyOnLoad(gameObject);
         }
         else
         {
@@ -37,15 +43,34 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    private void Start()
+    {
+        GameObject findText = GameObject.Find("TimeText");
+        if (findText != null)
+        {
+            timerText = findText.GetComponent<TMPro.TextMeshProUGUI>();
+        }
+    }
+
     public void StartGame()
     {
+        Time.timeScale = 1f;
         SceneManager.LoadScene(gameSceneName);
+    }
+
+    public int GetSeconds()
+    {
+        return (int)survivalTime;
     }
 
     public void GameOver()
     {
-        GameDataManager.Instance.SaveGameResult();
-        GoTitle();
+        if (gameOverPanel != null)
+        {
+            gameOverPanel.SetActive(true);
+        }
+
+        Time.timeScale = 0f;
     }
 
     public void GoTitle()
@@ -59,5 +84,12 @@ public class GameManager : MonoBehaviour
         pebbleText.text = "열매: " + pebbleCount + "개";
         Debug.Log("열매 획득! 현재 개수: " + pebbleCount);
         ItemSpawner.Instance.SpawnOnePebble();
+    }
+
+    public void GoToMainMenu()
+    {
+        Time.timeScale = 1f;
+
+        SceneManager.LoadScene("TitleScene");
     }
 }
