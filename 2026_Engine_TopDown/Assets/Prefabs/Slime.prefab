@@ -123,7 +123,7 @@ CircleCollider2D:
   m_CallbackLayers:
     serializedVersion: 2
     m_Bits: 4294967295
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
@@ -166,4 +166,5 @@ MonoBehaviour:
   - {fileID: 4459579530001961876, guid: c7354be5885e2df41b37714fa098ef09, type: 3}
   - {fileID: 5941933952779461806, guid: c7354be5885e2df41b37714fa098ef09, type: 3}
   - {fileID: 1968625709572120673, guid: c7354be5885e2df41b37714fa098ef09, type: 3}
+  attackDamage: 10
   frameTime: 0.15

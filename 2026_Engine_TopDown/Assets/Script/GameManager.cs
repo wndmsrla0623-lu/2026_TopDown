@@ -56,8 +56,8 @@ public class GameManager : MonoBehaviour
     public void AddPebble()
     {
         pebbleCount = pebbleCount + 1;
-        pebbleText.text = "조약돌: " + pebbleCount + "개";
-        Debug.Log("조약돌 획득! 현재 개수: " + pebbleCount);
+        pebbleText.text = "열매: " + pebbleCount + "개";
+        Debug.Log("열매 획득! 현재 개수: " + pebbleCount);
         ItemSpawner.Instance.SpawnOnePebble();
     }
 }

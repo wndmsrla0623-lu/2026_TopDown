@@ -13,6 +13,9 @@ public class MonsterChase : MonoBehaviour
     public Sprite[] spriteLeft;
     public Sprite[] spriteRight;
 
+    public int attackDamage = 10;
+    public float knockbackForce = 3f;
+
     [Header("애니메이션 속도 설정")]
     public float frameTime = 0.15f;    // 프레임 전환 시간 (플레이어와 동일)
 
@@ -102,7 +105,22 @@ public class MonsterChase : MonoBehaviour
     {
         if (other.CompareTag("Player"))
         {
-            Debug.Log("으악! 슬라임한테 부딪혔다!");
+            PlayerHealth playerHealth = other.GetComponent<PlayerHealth>();
+
+            if (playerHealth != null)
+            {
+                // 1. 플레이어에게 데미지를 줍니다 (플레이어 무적 상태면 알아서 무시됨)
+                playerHealth.TakeDamage(attackDamage);
+
+                // 2. ★ 둘이 한 몸처럼 겹치지 않도록 밀어내는 넉백 처리!
+                // 플레이어로부터 내가 온 방향의 반대 벡터를 구합니다.
+                Vector3 knockbackDirection = (transform.position - other.transform.position).normalized;
+
+                // 슬라임의 위치를 순간적으로 플레이어 바깥쪽으로 확 밀어버립니다.
+                transform.position += knockbackDirection * knockbackForce;
+            }
         }
     }
 }
+
+    
