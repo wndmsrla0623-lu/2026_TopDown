@@ -4,6 +4,6 @@ using System;
 
 public class SaveData
 {
-    public int deathCount;
-    public int totalPebbles;
+    public int bestTime;
+    public int bestPebbles;
 }

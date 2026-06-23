@@ -71,6 +71,12 @@ public class GameManager : MonoBehaviour
         }
 
         Time.timeScale = 0f;
+
+        if (GameDataManager.Instance != null)
+        {
+
+            GameDataManager.Instance.SaveGame((int)survivalTime, pebbleCount);
+        }
     }
 
     public void GoTitle()

@@ -5,7 +5,7 @@ using UnityEngine.SceneManagement;
 
 public class GameDataManager : MonoBehaviour
 {
-    public static GameDataManager Instance;
+    public static GameDataManager Instance { get; private set;}
 
     public float bestSurvivalTime;
 
@@ -15,6 +15,7 @@ public class GameDataManager : MonoBehaviour
 
     public int isTutorialFinished;
 
+    public SaveData currentSaveData = new SaveData();
 
     private string savePath;
 
@@ -34,9 +35,9 @@ public class GameDataManager : MonoBehaviour
                 return; // ⚠️ 중복 매니저 파괴 시 아래 로직 실행 방지
             }
 
-            savePath = System.IO.Path.Combine(Application.persistentDataPath, "SaveData.json");
-            LoadJsonData();
-            LoadPlayerPrefs();
+           savePath = Path.Combine(Application.persistentDataPath, "BestRecord.json");
+
+           LoadGame();
         }
 
     // 💡 싱글톤 오브젝트가 파괴될 때는 메모리 누수 방지를 위해 이벤트를 해제해 줍니다.
@@ -56,14 +57,14 @@ public class GameDataManager : MonoBehaviour
         int baseHP = gameSettingData.startHp;
         int bonusHp = gameSettingData.hpBonusPerDeath;
 
-        return baseHP + bonusHp * saveData.deathCount;
+        return baseHP + bonusHp * saveData.bestTime;
     }
 
     public int GetPlayerAttack()
     {
         int baseAttack = gameSettingData.startAttack;
         int bonusAttack = gameSettingData.atkBonusPerDeath;
-        return baseAttack + bonusAttack * saveData.deathCount;
+        return baseAttack + bonusAttack * saveData.bestTime;
     }
 
     public float GetPlayerMoveSpeed()
@@ -73,8 +74,8 @@ public class GameDataManager : MonoBehaviour
 
     public void SaveGameResult(float finalTime, int pebblesObtained)
     {
-        saveData.deathCount++;
-        saveData.totalPebbles += pebblesObtained;
+        saveData.bestTime++;
+        saveData.bestPebbles += pebblesObtained;
 
         if (finalTime > bestSurvivalTime)
         {
@@ -106,6 +107,28 @@ public class GameDataManager : MonoBehaviour
         {
             saveData = new SaveData();
             SaveJsonData();
+        }
+    }
+
+    public void SaveGame(int scoreTime, int scorePebbles)
+    {
+        if (scoreTime > currentSaveData.bestTime) currentSaveData.bestTime = scoreTime;
+        if (scorePebbles > currentSaveData.bestPebbles) currentSaveData.bestPebbles = scorePebbles;
+
+        string json = JsonUtility.ToJson(currentSaveData, true);
+
+        File.WriteAllText(savePath, json);
+        Debug.Log("JSON 최고 기록 저장 완료!:" + json);
+    }
+
+    public void LoadGame()
+    {
+        if (File.Exists(savePath))
+        {
+            string json = File.ReadAllText(savePath);
+
+            currentSaveData = JsonUtility.FromJson<SaveData>(json);
+            Debug.Log("JSON 데이터 로드 성공!");
         }
     }
 
