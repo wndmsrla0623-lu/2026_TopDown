@@ -3216,7 +3216,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MonsterSpawner
   slimePrefab: {fileID: 7931834209623805671, guid: 88ac829dd446ae149b24dfdaca430f12, type: 3}
-  spawnInterval: 2
+  spawnInterval: 6
   minX: -6.5
   maxX: 6.5
   minY: -4.5
