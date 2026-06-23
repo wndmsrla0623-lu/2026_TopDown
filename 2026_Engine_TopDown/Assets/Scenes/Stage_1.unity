@@ -3119,6 +3119,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ItemSpawner
   pebblePrefab: {fileID: 7299623170816881929, guid: cef358a2bfa1d7e4dbaf21eb7fc016ef, type: 3}
+  iceItemPrefab: {fileID: 250507370361102783, guid: 7467566f88c42074fa27f73d087ef962, type: 3}
   spawnCount: 20
   minX: -6.5
   maxX: 6.5
@@ -3215,7 +3216,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MonsterSpawner
   slimePrefab: {fileID: 7931834209623805671, guid: 88ac829dd446ae149b24dfdaca430f12, type: 3}
-  spawnInterval: 6
+  spawnInterval: 2
   minX: -6.5
   maxX: 6.5
   minY: -4.5

@@ -111,4 +111,20 @@ public class MonsterChase : MonoBehaviour
             }
         }
     }
+
+    // MonsterChase.cs 내부에 추가할 멈춤 기능 예시
+    public System.Collections.IEnumerator FreezeMonsterRoutine()
+    {
+        // ⭕ 이 스크립트(MonsterChase)의 업데이트 추적 기능을 고장 내서 멈추게 만듭니다!
+        this.enabled = false;
+
+        // 만약 리지드바디로 움직인다면 물리 속도도 강제로 0으로 잡아줍니다.
+        Rigidbody2D rb = GetComponent<Rigidbody2D>();
+        if (rb != null) rb.linearVelocity = Vector2.zero;
+
+        yield return new WaitForSeconds(3f); // 3초 정지
+
+        // ⭕ 3초 뒤에 다시 스크립트를 켜서 추적을 시작하게 만듭니다.
+        this.enabled = true;
+    }
 }

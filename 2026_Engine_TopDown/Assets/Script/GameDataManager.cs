@@ -112,23 +112,61 @@ public class GameDataManager : MonoBehaviour
 
     public void SaveGame(int scoreTime, int scorePebbles)
     {
-        if (scoreTime > currentSaveData.bestTime) currentSaveData.bestTime = scoreTime;
-        if (scorePebbles > currentSaveData.bestPebbles) currentSaveData.bestPebbles = scorePebbles;
+        if (currentSaveData == null)
+        {
+            currentSaveData = new SaveData();
+        }
 
+        // ⭕ scoreTime과 scorePebbles로 이름을 정확하게 맞춰줍니다!
+        if (scoreTime > currentSaveData.bestTime)
+        {
+            currentSaveData.bestTime = scoreTime;
+        }
+        if (scorePebbles > currentSaveData.bestPebbles)
+        {
+            currentSaveData.bestPebbles = scorePebbles;
+        }
+
+        // 🔓 항상 얼음 아이템은 열려있도록 보장!
+        currentSaveData.isIceItemUnlocked = true;
+
+        try
+        {
+            string json = JsonUtility.ToJson(currentSaveData, true);
+
+            // 💡 만약 saveFilePath 밑에 계속 빨간 줄이 뜬다면, 
+            // 💡 시스템 고정 경로 주소인 'Application.persistentDataPath + "/BestRecord.json"' 로 직접 찔러줍니다.
+            string targetPath = Application.persistentDataPath + "/BestRecord.json";
+
+            System.IO.File.WriteAllText(targetPath, json);
+            Debug.Log("💾 세이브 파일 저장 성공! 경로: " + targetPath);
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogError("파일 저장 중 에러 발생: " + e.Message);
+        }
+    }
+
+    public void SaveGame()
+    {
         string json = JsonUtility.ToJson(currentSaveData, true);
-
-        File.WriteAllText(savePath, json);
-        Debug.Log("JSON 최고 기록 저장 완료!:" + json);
+        System.IO.File.WriteAllText(savePath, json);
+        Debug.Log("JSON 아이템 해금 데이터 즉시 저장 완료! 내역:\n" + json);
     }
 
     public void LoadGame()
     {
-        if (File.Exists(savePath))
+        if (System.IO.File.Exists(savePath))
         {
-            string json = File.ReadAllText(savePath);
-
+            string json = System.IO.File.ReadAllText(savePath);
+            // currentSaveData로 깔끔하게 통일하여 로드합니다.
             currentSaveData = JsonUtility.FromJson<SaveData>(json);
             Debug.Log("JSON 데이터 로드 성공!");
+        }
+        else
+        {
+            currentSaveData = new SaveData();
+            SaveGame(); // 이제 144번 줄 오류가 나지 않고 정상 작동합니다!
         }
     }
 
